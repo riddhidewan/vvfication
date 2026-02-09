@@ -5,17 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DBC | Account Verification</title>
     <style>
-        body { font-family: 'Courier New', Courier, monospace; background: #eef2f3; text-align: center; padding: 20px; transition: background 0.5s; }
+        body { font-family: 'Courier New', Courier, monospace; background: #eef2f3; text-align: center; padding: 20px; transition: background 0.5s; overflow-x: hidden; }
         .box { background: white; border: 2px solid #333; padding: 30px; display: inline-block; box-shadow: 10px 10px 0px #888; max-width: 500px; margin-top: 50px; position: relative; }
         h1 { color: #d9534f; font-size: 1.4rem; text-transform: uppercase; }
         .btn-container { margin-top: 40px; height: 150px; position: relative; display: flex; justify-content: center; align-items: center; gap: 20px; }
         button { padding: 15px 25px; font-weight: bold; cursor: pointer; border: 2px solid #333; transition: all 0.2s; }
         #yesBtn { background-color: #5cb85c; color: white; font-size: 1rem; z-index: 10; }
         #noBtn { background-color: #d9534f; color: white; }
-        .terms { font-size: 0.7rem; color: #777; margin-top: 30px; text-align: left; border-top: 1px solid #ddd; padding-top: 10px; }
-        .konami-hint { font-size: 0.6rem; color: #bbb; margin-top: 50px; text-decoration: none; }
+        .legal-link { font-size: 0.75rem; color: #0000EE; text-decoration: underline; cursor: pointer; margin-top: 20px; display: block; }
+        .konami-hint { font-size: 0.6rem; color: #bbb; margin-top: 60px; }
         
-        /* Lovey Dovey Mode Class */
+        /* Modal Style for Terms */
+        #termsModal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; border: 2px solid #333; width: 80%; max-width: 400px; text-align: left; font-size: 0.8rem; }
+        .close { float: right; cursor: pointer; font-weight: bold; }
+
+        /* Lovey Dovey Mode */
         .lovey-dovey { background: #ffc0cb !important; }
         .heart { position: absolute; color: red; font-size: 20px; animation: float 3s infinite; }
         @keyframes float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100px); opacity: 0; } }
@@ -33,8 +38,15 @@
         <button id="noBtn" onmouseover="handleNo()" onclick="handleNo()">NO</button>
     </div>
 
-    <div class="terms">
-        <strong>Terms and Conditions:</strong> By completing the above verification, the user agrees to a minimum of one (1!!) hour of undivided attention upon the admin’s return. The DBC is not responsible for any emotional distress caused by the unclickable ‘No’ button.
+    <span class="legal-link" onclick="openTerms()">View Terms and Conditions</span>
+</div>
+
+<div id="termsModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeTerms()">&times;</span>
+        <strong>Legal Disclosure:</strong><br><br>
+        By completing the above verification, the user agrees to a minimum of one (1!!) hour of undivided attention upon the admin’s return. <br><br>
+        The DBC is not responsible for any emotional distress caused by the unclickable ‘No’ button or the aggressive growth of the 'Yes' button.
     </div>
 </div>
 
@@ -44,20 +56,12 @@
     let yesSize = 1;
 
     function handleNo() {
-        // 1. Make the Yes button 20% larger
         yesSize += 0.2;
         document.getElementById('yesBtn').style.transform = `scale(${yesSize})`;
-
-        // 2. Swap the buttons
         const container = document.getElementById('btnContainer');
         const yes = document.getElementById('yesBtn');
         const no = document.getElementById('noBtn');
-        
-        if (no.nextElementSibling === null) {
-            container.insertBefore(no, yes);
-        } else {
-            container.appendChild(no);
-        }
+        if (no.nextElementSibling === null) { container.insertBefore(no, yes); } else { container.appendChild(no); }
     }
 
     function verify() {
@@ -74,13 +78,29 @@
         `;
     }
 
-    // Konami Code Logic
+    function openTerms() { document.getElementById('termsModal').style.display = "block"; }
+    function closeTerms() { document.getElementById('termsModal').style.display = "none"; }
+
     let cursor = 0;
     const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     document.addEventListener('keydown', (e) => {
         cursor = (e.key === konamiCode[cursor]) ? cursor + 1 : 0;
         if (cursor === konamiCode.length) {
-            activateLoveyDovey();
+            document.body.classList.add('lovey-dovey');
+            alert("💖 SUPER LOVEY DOVEY MODE ACTIVATED 💖");
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = '100vh';
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 3000);
+            }, 300);
             cursor = 0;
         }
     });
+</script>
+
+</body>
+</html>
