@@ -6,170 +6,173 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #ffd6e8, #ffeef6);
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #444;
-    overflow: hidden;
-    cursor: none;
-  }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #ffd6e8, #ffeef6);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: none;
+}
 
-  .card {
-    background: white;
-    padding: 2.5rem;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    max-width: 440px;
-    position: relative;
-  }
+/* ====== Cards ====== */
+.card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  max-width: 440px;
+  position: relative;
+}
 
-  h1 { margin-bottom: 1.5rem; }
+.buttons {
+  position: relative;
+  height: 100px;
+  margin-top: 1rem;
+}
 
-  .buttons {
-    position: relative;
-    height: 90px;
-  }
+button {
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: none;
+  font-size: 1rem;
+  position: absolute;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
 
-  button {
-    padding: 12px 28px;
-    border-radius: 999px;
-    border: none;
-    font-size: 1rem;
-    position: absolute;
-    transition: all 0.2s ease;
-  }
+#yes {
+  background: #ff6fae;
+  color: white;
+}
 
-  #yes {
-    background: #ff6fae;
-    color: white;
-    left: 50%;
-    transform: translateX(-50%);
-  }
+#no {
+  background: #eee;
+  color: #666;
+}
 
-  #yes:hover {
-    animation: shake 0.3s infinite;
-  }
+#yes:hover {
+  animation: shake 0.3s infinite;
+}
 
-  @keyframes shake {
-    0% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-2px); }
-    100% { transform: translateX(-50%) translateY(0); }
-  }
+@keyframes shake {
+  50% { transform: translateY(-2px); }
+}
 
-  #no {
-    background: #eee;
-    color: #666;
-    left: 20%;
-  }
+/* ====== Terms ====== */
+.terms-link {
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  display: block;
+  color: #888;
+  cursor: pointer;
+  text-decoration: underline;
+}
 
-  .terms-link {
-    font-size: 0.75rem;
-    margin-top: 1rem;
-    display: block;
-    color: #888;
-    cursor: pointer;
-    text-decoration: underline;
-  }
+/* ====== Modal ====== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  align-items: center;
+  justify-content: center;
+}
 
-  .modal, .captcha {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    align-items: center;
-    justify-content: center;
-  }
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 420px;
+  text-align: center;
+}
 
-  .modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    max-width: 420px;
-    font-size: 0.9rem;
-    text-align: center;
-  }
+/* ====== CAPTCHA ====== */
+.captcha { display:none; }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 80px);
-    gap: 8px;
-    justify-content: center;
-    margin: 1rem 0;
-  }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  gap: 8px;
+  justify-content: center;
+  margin: 1rem 0;
+}
 
-  .cell {
-    background: #ffe0ef;
-    height: 80px;
-    cursor: pointer;
-    border-radius: 10px;
-  }
+.cell {
+  height: 90px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  outline: 3px solid transparent;
+}
 
-  .cell.selected {
-    background: #ff6fae;
-  }
+.cell.selected {
+  outline: 3px solid #ff6fae;
+}
 
-  .loading, .receipt { display: none; }
+/* ====== Loading ====== */
+.loading, .receipt { display:none; }
 
-  .bar {
-    background: #eee;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 1rem;
-  }
+.bar {
+  background: #eee;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
 
-  .bar-fill {
-    height: 14px;
-    width: 0%;
-    background: linear-gradient(90deg, #ff6fae, #ff9ad5);
-  }
+.bar-fill {
+  height: 14px;
+  width: 0%;
+  background: linear-gradient(90deg, #ff6fae, #ff9ad5);
+}
 
-  .lovey {
-    background: linear-gradient(135deg, #ff9ad5, #ffd1ec);
-    animation: hue 5s infinite linear;
-  }
+/* ====== Konami Hint ====== */
+.hint {
+  position: fixed;
+  bottom: 12px;
+  font-size: 0.85rem;
+  color: #ff9acb;
+  letter-spacing: 2px;
+  opacity: 0.85;
+}
 
-  @keyframes hue {
-    from { filter: hue-rotate(0deg); }
-    to { filter: hue-rotate(360deg); }
-  }
+/* ====== Lovey Mode ====== */
+.lovey {
+  background: linear-gradient(135deg, #ff9ad5, #ffd1ec, #ffe8f5);
+  animation: shimmer 8s infinite linear;
+}
 
-  .sparkle {
-    position: fixed;
-    pointer-events: none;
-    animation: pop 0.8s forwards;
-  }
+@keyframes shimmer {
+  from { filter: hue-rotate(0deg); }
+  to { filter: hue-rotate(360deg); }
+}
 
-  @keyframes pop {
-    to { transform: scale(2); opacity: 0; }
-  }
+.heart {
+  position: fixed;
+  font-size: 20px;
+  animation: floatUp 4s linear forwards;
+  pointer-events: none;
+}
 
-  .popup {
-    position: fixed;
-    top: 10%;
-    right: 10%;
-    background: white;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    animation: fade 3s forwards;
-  }
+@keyframes floatUp {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-120px); opacity: 0; }
+}
 
-  @keyframes fade {
-    0% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-20px); }
-  }
+/* ====== Sparkles ====== */
+.sparkle {
+  position: fixed;
+  pointer-events: none;
+  animation: pop 0.8s forwards;
+}
 
-  .hint {
-    position: fixed;
-    bottom: 8px;
-    font-size: 0.65rem;
-    color: #aaa;
-  }
+@keyframes pop {
+  to { transform: scale(2); opacity: 0; }
+}
 </style>
 </head>
 
@@ -184,24 +187,23 @@
   <span class="terms-link" id="openTerms">Terms & Conditions</span>
 </div>
 
-<div class="captcha" id="captcha">
+<!-- CAPTCHA -->
+<div class="modal captcha" id="captcha">
   <div class="modal-content">
     <h3>Security Check</h3>
-    <p>Select all squares containing <strong>true love</strong></p>
-    <div class="grid">
-      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-      <div class="cell"></div><div class="cell"></div><div class="cell"></div>
-    </div>
-    <button onclick="finishCaptcha()">Verify</button>
+    <p>Select all images containing <strong>true love</strong></p>
+    <div class="grid" id="captchaGrid"></div>
+    <button onclick="verifyCaptcha()">Verify</button>
   </div>
 </div>
 
+<!-- Loading -->
 <div class="card loading" id="loading">
   <h2>Verifying Babe Status…</h2>
   <div class="bar"><div class="bar-fill" id="barFill"></div></div>
 </div>
 
+<!-- Receipt -->
 <div class="card receipt" id="receipt">
   <h2>Transaction Successful ✅</h2>
   <p><strong>Your “Babe” status has been successfully verified.</strong></p>
@@ -209,10 +211,18 @@
   <p>Patch scheduled tonight. Please prepare hugs.</p>
 </div>
 
+<!-- Terms Modal -->
 <div class="modal" id="termsModal">
   <div class="modal-content">
-    <p>By proceeding, user agrees to one (1!!) hour of undivided attention.</p>
-    <p>DBC not responsible for No button trauma.</p>
+    <p><strong>Terms and Conditions</strong></p>
+    <p>
+      By completing the above verification process, the user agrees to a minimum
+      of one (1!!) uninterrupted hour of undivided attention upon the administrator’s return.
+    </p>
+    <p>
+      The DBC assumes no responsibility for any emotional distress caused by the
+      intentionally unclickable “No” button.
+    </p>
     <button onclick="closeTerms()">Understood 💗</button>
   </div>
 </div>
@@ -220,78 +230,134 @@
 <div class="hint">↑ ↑ ↓ ↓ ← → ← → B A</div>
 
 <script>
-let yes = document.getElementById('yes');
-let no = document.getElementById('no');
+/* ===== Yes / No Logic ===== */
+const yes = document.getElementById('yes');
+const no = document.getElementById('no');
 let scale = 1;
+let swapped = false;
+
+function positionButtons() {
+  if (!swapped) {
+    yes.style.left = '50%';
+    yes.style.transform = `translateX(-50%) scale(${scale})`;
+    no.style.left = '20%';
+  } else {
+    no.style.left = '50%';
+    no.style.transform = 'translateX(-50%)';
+    yes.style.left = '20%';
+  }
+}
+
+positionButtons();
 
 no.onclick = () => {
   scale += 0.2;
-  yes.style.transform = `translateX(-50%) scale(${scale})`;
+  positionButtons();
 };
 
 no.onmouseover = () => {
-  [yes.style.left, no.style.left] = [no.style.left, yes.style.left];
+  swapped = !swapped;
+  positionButtons();
 };
 
 yes.onclick = () => {
-  document.getElementById('mainCard').style.display = 'none';
-  document.getElementById('captcha').style.display = 'flex';
+  mainCard.style.display = 'none';
+  captcha.style.display = 'flex';
+  generateCaptcha();
 };
 
-document.querySelectorAll('.cell').forEach(c =>
-  c.onclick = () => c.classList.toggle('selected')
-);
+/* ===== CAPTCHA ===== */
+const trueLoveImages = [
+  'true-love/love1.jpg',
+  'true-love/love2.jpg',
+  'true-love/love3.jpg'
+];
 
-function finishCaptcha() {
-  document.getElementById('captcha').style.display = 'none';
-  document.getElementById('loading').style.display = 'block';
+const decoyImages = [
+  'decoy/decoy1.jpg',
+  'decoy/decoy2.jpg',
+  'decoy/decoy3.jpg'
+];
 
-  let p = 0, bar = document.getElementById('barFill');
+let correctSet = new Set();
+
+function generateCaptcha() {
+  const grid = document.getElementById('captchaGrid');
+  grid.innerHTML = '';
+  correctSet.clear();
+
+  let images = [];
+  for (let i = 0; i < 3; i++) {
+    images.push({src: trueLoveImages[Math.floor(Math.random()*trueLoveImages.length)], true:true});
+    images.push({src: decoyImages[Math.floor(Math.random()*decoyImages.length)], true:false});
+  }
+
+  images = images.sort(() => Math.random() - 0.5).slice(0,9);
+
+  images.forEach((img, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.style.backgroundImage = `url(${img.src})`;
+    if (img.true) correctSet.add(idx);
+    cell.onclick = () => cell.classList.toggle('selected');
+    grid.appendChild(cell);
+  });
+}
+
+function verifyCaptcha() {
+  captcha.style.display = 'none';
+  loading.style.display = 'block';
+
+  let p = 0;
+  let bar = document.getElementById('barFill');
   let i = setInterval(() => {
-    p += Math.random()*25;
+    p += Math.random() * 30;
     bar.style.width = Math.min(p,100)+'%';
     if (p >= 100) {
       clearInterval(i);
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('receipt').style.display = 'block';
+      loading.style.display = 'none';
+      receipt.style.display = 'block';
     }
   }, 400);
 }
 
+/* ===== Terms ===== */
 openTerms.onclick = () => termsModal.style.display = 'flex';
 function closeTerms(){ termsModal.style.display='none'; }
 
-// Konami chaos
+/* ===== Konami Lovey Mode ===== */
 const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-let idx = 0, chaos = false;
+let idx = 0;
+let lovey = false;
 
 window.onkeydown = e => {
   if (e.key === code[idx]) {
     idx++;
     if (idx === code.length) {
-      chaos = !chaos;
+      lovey = !lovey;
       document.body.classList.toggle('lovey');
-      setInterval(() => popup(), 2000);
       idx = 0;
     }
   } else idx = 0;
 };
 
-function popup() {
-  if (!chaos) return;
-  const msgs = ['LOVE OVERFLOW 💥','KISS BUFFER FULL 💋','CRITICAL AFFECTION ⚠️'];
-  let p = document.createElement('div');
-  p.className = 'popup';
-  p.textContent = msgs[Math.floor(Math.random()*msgs.length)];
-  document.body.appendChild(p);
-  setTimeout(()=>p.remove(),3000);
-}
+/* Floating hearts */
+setInterval(() => {
+  if (!lovey) return;
+  const h = document.createElement('div');
+  h.className = 'heart';
+  h.textContent = '💖';
+  h.style.left = Math.random() * window.innerWidth + 'px';
+  h.style.top = window.innerHeight + 'px';
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),4000);
+}, 600);
 
-// Sparkly cursor
+/* Sparkly cursor */
 document.onmousemove = e => {
-  let s = document.createElement('div');
+  const s = document.createElement('div');
   s.className = 'sparkle';
-  s.textContent = chaos ? '💖✨💞' : '✨';
+  s.textContent = lovey ? '💖✨' : '✨';
   s.style.left = e.pageX+'px';
   s.style.top = e.pageY+'px';
   document.body.appendChild(s);
