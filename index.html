@@ -14,24 +14,26 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  margin: 0;
   cursor: none;
 }
 
 /* ====== Cards ====== */
 .card {
   background: white;
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 20px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  max-width: 440px;
+  width: 90%;
+  max-width: 400px;
   position: relative;
   z-index: 10;
 }
 
 .buttons {
   position: relative;
-  height: 120px; /* Slightly taller to accommodate growing button */
+  height: 140px; 
   margin-top: 1rem;
 }
 
@@ -40,7 +42,7 @@ button {
   border-radius: 999px;
   border: none;
   font-size: 1rem;
-  transition: left 0.3s ease, transform 0.2s ease; /* Smooth movement and scaling */
+  transition: left 0.3s ease, transform 0.2s ease;
   cursor: pointer;
   position: absolute;
 }
@@ -50,9 +52,10 @@ button {
   color: white;
   font-weight: bold;
   z-index: 20;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-/* Exited Shiver Animation */
 #yes:hover {
   animation: shiver 0.15s infinite;
 }
@@ -68,19 +71,10 @@ button {
 #no {
   background: #eee;
   color: #666;
+  left: 15%;
 }
 
-/* ====== Terms ====== */
-.terms-link {
-  font-size: 0.8rem;
-  margin-top: 1rem;
-  display: block;
-  color: #888;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-/* ====== Modal ====== */
+/* ====== Modal / CAPTCHA ====== */
 .modal {
   display: none;
   position: fixed;
@@ -93,56 +87,43 @@ button {
 
 .modal-content {
   background: white;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 16px;
-  max-width: 420px;
+  width: 340px; /* Fixed width to prevent stretching */
   text-align: center;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-/* ====== CAPTCHA ====== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 100px);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  justify-content: center;
   margin: 1.5rem 0;
 }
 
 .cell {
-  width: 100px;
-  height: 100px;
+  aspect-ratio: 1 / 1;
   border-radius: 4px;
   background-size: cover;
   background-position: center;
+  background-color: #fce4ec; /* Placeholder color if image fails */
   cursor: pointer;
-  border: 4px solid transparent;
-  transition: border 0.2s;
+  border: 3px solid transparent;
+  transition: all 0.2s;
 }
 
 .cell.selected {
-  border: 4px solid #ff6fae;
-  position: relative;
-}
-
-.cell.selected::after {
-  content: '✔️';
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  background: #ff6fae;
-  color: white;
-  font-size: 12px;
-  border-radius: 50%;
-  padding: 2px;
+  border: 3px solid #ff6fae;
+  transform: scale(0.95);
 }
 
 .verify-btn {
   background: #ff6fae;
   color: white;
+  position: relative; /* Fixed: no longer absolute/stretched */
   width: 100%;
   font-weight: bold;
+  padding: 12px;
 }
 
 /* ====== Loading & Receipt ====== */
@@ -159,20 +140,6 @@ button {
   height: 14px;
   width: 0%;
   background: linear-gradient(90deg, #ff6fae, #ff9ad5);
-}
-
-/* ====== Effects ====== */
-.heart {
-  position: fixed;
-  font-size: 20px;
-  animation: floatUp 4s linear forwards;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes floatUp {
-  from { transform: translateY(0) rotate(0deg); opacity: 1; }
-  to { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
 }
 
 .sparkle {
@@ -196,12 +163,11 @@ button {
     <button id="yes">Yes 💖</button>
     <button id="no">No</button>
   </div>
-  <span class="terms-link" id="openTerms">Terms & Conditions</span>
 </div>
 
 <div class="modal" id="captchaModal">
   <div class="modal-content">
-    <h3>Security Check</h3>
+    <h3 style="margin-top:0;">Security Check</h3>
     <p>Pick true love 😌</p>
     <div class="grid" id="captchaGrid"></div>
     <button class="verify-btn" onclick="verifyCaptcha()">Verify Identity</button>
@@ -215,18 +181,8 @@ button {
 
 <div class="card receipt" id="receipt">
   <h2>Transaction Successful ✅</h2>
-  <p><strong>Your “Babe” status has been successfully verified.</strong></p>
   <p>Account Balance: <strong>1,000,000 smooches</strong></p>
-  <p>Patch scheduled tonight. Please prepare hugs.</p>
-</div>
-
-<div class="modal" id="termsModal">
-  <div class="modal-content">
-    <p><strong>Terms and Conditions</strong></p>
-    <p>By completing the above verification process, the user agrees to a minimum of one (1!!) uninterrupted hour of undivided attention upon the administrator’s return.</p>
-    <p>The DBC assumes no responsibility for any emotional distress caused by the intentionally unclickable “No” button.</p>
-    <button onclick="closeTerms()" style="background:#ff6fae; color:white;">Understood 💗</button>
-  </div>
+  <p>Patch scheduled tonight. Prepare hugs.</p>
 </div>
 
 <script>
@@ -242,30 +198,19 @@ let swapped = false;
 
 /* ===== Yes / No Logic ===== */
 function positionButtons() {
-  // We keep the Yes button at center (50%) but let it grow
-  // The No button swaps between 15% and 80% to run away
+  yes.style.transform = `translateX(-50%) scale(${scale})`;
   if (!swapped) {
-    yes.style.left = '50%';
-    yes.style.transform = `translateX(-50%) scale(${scale})`;
-    no.style.left = '15%';
-    no.style.transform = `translateX(0)`;
+    no.style.left = '10%';
   } else {
-    no.style.left = '80%';
-    no.style.transform = 'translateX(-100%)';
-    yes.style.left = '50%';
-    yes.style.transform = `translateX(-50%) scale(${scale})`;
+    no.style.left = '70%';
   }
 }
-positionButtons();
 
-// Clicking No makes Yes grow by 20% (0.2)
 no.onclick = (e) => { 
-  e.preventDefault();
   scale += 0.2; 
   positionButtons(); 
 };
 
-// Hovering No makes it swap positions
 no.onmouseover = () => { 
   swapped = !swapped; 
   positionButtons(); 
@@ -278,9 +223,10 @@ yes.onclick = () => {
 };
 
 /* ===== CAPTCHA Logic ===== */
+// Check your folder names! Are they "true-love" or "True-Love"?
 const trueLoveImages = [
-  'true-love/love1.jpg', 'true-love/love2.jpg', 
-  'true-love/love3.jpg', 'true-love/love4.jpg'
+  'true-love/true-love1.jpg', 'true-love/true-love2.jpg', 
+  'true-love/true-love3.jpg', 'true-love/true-love4.jpg'
 ];
 const decoyImages = [
   'decoy/decoy1.jpg', 'decoy/decoy2.jpg', 
@@ -301,7 +247,8 @@ function generateCaptcha() {
   deck.forEach((img) => {
     const cell = document.createElement('div');
     cell.className = 'cell';
-    cell.style.backgroundImage = `url(${img.src})`;
+    // Use background-image for the picture
+    cell.style.backgroundImage = `url('${img.src}')`;
     cell.dataset.isTrue = img.isTrue;
     cell.onclick = () => cell.classList.toggle('selected');
     grid.appendChild(cell);
@@ -311,16 +258,18 @@ function generateCaptcha() {
 function verifyCaptcha() {
   const cells = document.querySelectorAll('.cell');
   let isCorrect = true;
+  let selectedCount = 0;
 
   cells.forEach(cell => {
     const isSelected = cell.classList.contains('selected');
     const isActuallyTrue = cell.dataset.isTrue === 'true';
+    if (isSelected) selectedCount++;
     if ((isActuallyTrue && !isSelected) || (!isActuallyTrue && isSelected)) {
       isCorrect = false;
     }
   });
 
-  if (isCorrect) {
+  if (isCorrect && selectedCount > 0) {
     captchaModal.style.display = 'none';
     startLoading();
   } else {
@@ -343,10 +292,6 @@ function startLoading() {
     }
   }, 300);
 }
-
-/* ===== Terms & Misc ===== */
-document.getElementById('openTerms').onclick = () => document.getElementById('termsModal').style.display = 'flex';
-function closeTerms() { document.getElementById('termsModal').style.display = 'none'; }
 
 document.onmousemove = e => {
   const s = document.createElement('div');
