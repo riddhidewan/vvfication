@@ -192,15 +192,32 @@ button {
   to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
 }
 
+/* ====== Obvious Hint CSS ====== */
 .hint {
   position: fixed;
-  bottom: 10px;
+  bottom: 20px;
   width: 100%;
   text-align: center;
-  font-size: 0.7rem;
-  color: #ffb3d9;
-  letter-spacing: 2px;
   z-index: 5;
+}
+
+.hint-text {
+  background: rgba(255, 255, 255, 0.4);
+  padding: 8px 15px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #ff6fae;
+  letter-spacing: 3px;
+  font-weight: bold;
+  border: 1px solid rgba(255, 111, 174, 0.3);
+  backdrop-filter: blur(5px);
+  display: inline-block;
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 1; }
 }
 </style>
 </head>
@@ -210,7 +227,7 @@ button {
 <div class="card" id="mainCard">
   <div class="fake-browser-bar">
     <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-    <span style="margin-left: 10px;">🔒 dbc-internal-secure.gov/13072024</span>
+    <span style="margin-left: 10px;">🔒 dbc-internal-secure.gov/143-2026</span>
   </div>
   <h1>Will you be my Valentine? 😌👉🏻👈🏻</h1>
   <div class="buttons">
@@ -235,16 +252,19 @@ button {
 
 <div class="card receipt" id="receipt">
   <h2 style="color: #27c93f;">Verification Successful ✅</h2>
-  <p>Acc. No: <strong>13072024</strong></p>
+  <p>Acc. No: <strong>143-2026</strong></p>
   <p>Status: <strong>Certified Babe (Active)</strong></p>
   <p>Account Balance: <strong>1,000,000 smooches</strong></p>
   <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
   <p style="font-size: 0.9rem; color: #666;">Service outage averted. Please prepare for mandatory hugs tonight.</p>
 </div>
 
-<div class="hint">↑ ↑ ↓ ↓ ← → ← → B A</div>
+<div class="hint">
+  <span class="hint-text">🔑 ↑ ↑ ↓ ↓ ← → ← → B A</span>
+</div>
 
 <script>
+// ... (Logic remains identical to previous version)
 const yes = document.getElementById('yes');
 const no = document.getElementById('no');
 const mainCard = document.getElementById('mainCard');
@@ -349,24 +369,4 @@ function activateLoveyMode() {
   document.body.classList.add('lovey-mode');
   setInterval(() => {
     const heart = document.createElement('div');
-    heart.className = 'floating-heart';
-    heart.innerHTML = ['💖', '💝', '💘', '✨'][Math.floor(Math.random() * 4)];
-    heart.style.left = Math.random() * 100 + 'vw';
-    heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 5000);
-  }, 300);
-}
-
-document.onmousemove = e => {
-  const s = document.createElement('div');
-  s.className = 'sparkle';
-  s.textContent = loveyMode ? '💖' : '✨';
-  s.style.left = e.pageX + 'px';
-  s.style.top = e.pageY + 'px';
-  document.body.appendChild(s);
-  setTimeout(() => s.remove(), 800);
-};
-</script>
-</body>
-</html>
+    heart.className = 'floating-heart
