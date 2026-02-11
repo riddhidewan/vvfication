@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Valentine Verification</title>
+<title>DBC | Security Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -23,10 +23,30 @@ body.lovey-mode {
   background: linear-gradient(135deg, #ff85b3, #ffb3d9);
 }
 
+/* ====== Fake Browser Bar ====== */
+.fake-browser-bar {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  color: #999;
+  border-bottom: 1px solid #eee;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
 /* ====== Cards ====== */
 .card {
   background: white;
-  padding: 2rem;
+  padding: 3.5rem 2rem 2rem 2rem;
   border-radius: 20px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
@@ -38,7 +58,7 @@ body.lovey-mode {
 
 .buttons {
   position: relative;
-  height: 160px; /* Increased to fit the massive button */
+  height: 160px;
   margin-top: 1rem;
   display: flex;
   align-items: center;
@@ -50,7 +70,7 @@ button {
   border-radius: 999px;
   border: none;
   font-size: 1rem;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
 }
 
@@ -64,7 +84,6 @@ button {
   transform: translateX(-50%);
 }
 
-/* Combined Shiver and Scale */
 #yes.shiver-active:hover {
   animation: shiverGrow 0.15s infinite;
 }
@@ -81,8 +100,7 @@ button {
   background: #eee;
   color: #666;
   position: absolute;
-  left: 10%; /* Stays on the left as requested */
-  transition: left 0.3s ease;
+  left: 10%;
 }
 
 /* ====== CAPTCHA ====== */
@@ -134,7 +152,7 @@ button {
   padding: 12px;
 }
 
-/* ====== Extra Effects ====== */
+/* ====== Effects ====== */
 .loading, .receipt { display:none; }
 
 .bar {
@@ -190,6 +208,10 @@ button {
 <body>
 
 <div class="card" id="mainCard">
+  <div class="fake-browser-bar">
+    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+    <span style="margin-left: 10px;">🔒 dbc-internal-secure.gov/143-2026</span>
+  </div>
   <h1>Will you be my Valentine? 😌👉🏻👈🏻</h1>
   <div class="buttons">
     <button id="yes" class="shiver-active" style="--s: 1.0">Yes 💖</button>
@@ -207,14 +229,17 @@ button {
 </div>
 
 <div class="card loading" id="loading">
-  <h2>Verifying Babe Status…</h2>
+  <h2>DBC: Verifying Babe Status…</h2>
   <div class="bar"><div class="bar-fill" id="barFill"></div></div>
 </div>
 
 <div class="card receipt" id="receipt">
-  <h2>Transaction Successful ✅</h2>
+  <h2 style="color: #27c93f;">Verification Successful ✅</h2>
+  <p>Acc. No: <strong>143-2026</strong></p>
+  <p>Status: <strong>Certified Babe (Active)</strong></p>
   <p>Account Balance: <strong>1,000,000 smooches</strong></p>
-  <p>Patch scheduled tonight. Prepare hugs.</p>
+  <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+  <p style="font-size: 0.9rem; color: #666;">Service outage averted. Please prepare for mandatory hugs tonight.</p>
 </div>
 
 <div class="hint">↑ ↑ ↓ ↓ ← → ← → B A</div>
@@ -230,7 +255,6 @@ const receipt = document.getElementById('receipt');
 let scale = 1.0;
 let loveyMode = false;
 
-/* ===== Yes / No Logic ===== */
 no.onclick = () => {
   scale += 0.2;
   yes.style.setProperty('--s', scale);
@@ -243,7 +267,6 @@ yes.onclick = () => {
   generateCaptcha();
 };
 
-/* ===== CAPTCHA Logic ===== */
 const trueLoveImages = [
   'true-love/true-love1.jpg', 'true-love/true-love2.jpg', 
   'true-love/true-love3.jpg', 'true-love/true-love4.jpg'
@@ -306,7 +329,6 @@ function startLoading() {
   }, 300);
 }
 
-/* ===== Konami Logic & Transformation ===== */
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
 
@@ -325,8 +347,6 @@ window.addEventListener('keydown', (e) => {
 function activateLoveyMode() {
   loveyMode = true;
   document.body.classList.add('lovey-mode');
-  
-  // Start Heart Rain
   setInterval(() => {
     const heart = document.createElement('div');
     heart.className = 'floating-heart';
@@ -338,7 +358,6 @@ function activateLoveyMode() {
   }, 300);
 }
 
-/* ===== Cursor & Sparkles ===== */
 document.onmousemove = e => {
   const s = document.createElement('div');
   s.className = 'sparkle';
