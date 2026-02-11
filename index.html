@@ -16,6 +16,11 @@ body {
   overflow: hidden;
   margin: 0;
   cursor: none;
+  transition: background 1s ease;
+}
+
+body.lovey-mode {
+  background: linear-gradient(135deg, #ff85b3, #ffb3d9);
 }
 
 /* ====== Cards ====== */
@@ -33,8 +38,11 @@ body {
 
 .buttons {
   position: relative;
-  height: 140px; 
+  height: 160px; /* Increased to fit the massive button */
   margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button {
@@ -42,9 +50,8 @@ button {
   border-radius: 999px;
   border: none;
   font-size: 1rem;
-  transition: left 0.3s ease, transform 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
   cursor: pointer;
-  position: absolute;
 }
 
 #yes {
@@ -52,29 +59,33 @@ button {
   color: white;
   font-weight: bold;
   z-index: 20;
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
 
-#yes:hover {
-  animation: shiver 0.15s infinite;
+/* Combined Shiver and Scale */
+#yes.shiver-active:hover {
+  animation: shiverGrow 0.15s infinite;
 }
 
-@keyframes shiver {
-  0% { transform: translateX(-50%) translate(0, 0); }
-  25% { transform: translateX(-50%) translate(2px, -2px); }
-  50% { transform: translateX(-50%) translate(-2px, 2px); }
-  75% { transform: translateX(-50%) translate(2px, 2px); }
-  100% { transform: translateX(-50%) translate(-2px, -2px); }
+@keyframes shiverGrow {
+  0% { transform: translateX(-50%) scale(var(--s)) translate(0, 0); }
+  25% { transform: translateX(-50%) scale(var(--s)) translate(2px, -2px); }
+  50% { transform: translateX(-50%) scale(var(--s)) translate(-2px, 2px); }
+  75% { transform: translateX(-50%) scale(var(--s)) translate(2px, 2px); }
+  100% { transform: translateX(-50%) scale(var(--s)) translate(-2px, -2px); }
 }
 
 #no {
   background: #eee;
   color: #666;
-  left: 15%;
+  position: absolute;
+  left: 10%; /* Stays on the left as requested */
+  transition: left 0.3s ease;
 }
 
-/* ====== Modal / CAPTCHA ====== */
+/* ====== CAPTCHA ====== */
 .modal {
   display: none;
   position: fixed;
@@ -89,7 +100,7 @@ button {
   background: white;
   padding: 1.5rem;
   border-radius: 16px;
-  width: 340px; /* Fixed width to prevent stretching */
+  width: 340px;
   text-align: center;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
@@ -106,27 +117,24 @@ button {
   border-radius: 4px;
   background-size: cover;
   background-position: center;
-  background-color: #fce4ec; /* Placeholder color if image fails */
+  background-color: #fce4ec;
   cursor: pointer;
   border: 3px solid transparent;
-  transition: all 0.2s;
 }
 
 .cell.selected {
   border: 3px solid #ff6fae;
-  transform: scale(0.95);
 }
 
 .verify-btn {
   background: #ff6fae;
   color: white;
-  position: relative; /* Fixed: no longer absolute/stretched */
   width: 100%;
   font-weight: bold;
   padding: 12px;
 }
 
-/* ====== Loading & Receipt ====== */
+/* ====== Extra Effects ====== */
 .loading, .receipt { display:none; }
 
 .bar {
@@ -152,6 +160,30 @@ button {
 @keyframes pop {
   to { transform: scale(2); opacity: 0; }
 }
+
+.floating-heart {
+  position: fixed;
+  bottom: -50px;
+  font-size: 24px;
+  animation: floatUp 4s linear forwards;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+@keyframes floatUp {
+  to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+}
+
+.hint {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #ffb3d9;
+  letter-spacing: 2px;
+  z-index: 5;
+}
 </style>
 </head>
 
@@ -160,7 +192,7 @@ button {
 <div class="card" id="mainCard">
   <h1>Will you be my Valentine? 😌👉🏻👈🏻</h1>
   <div class="buttons">
-    <button id="yes">Yes 💖</button>
+    <button id="yes" class="shiver-active" style="--s: 1.0">Yes 💖</button>
     <button id="no">No</button>
   </div>
 </div>
@@ -185,6 +217,8 @@ button {
   <p>Patch scheduled tonight. Prepare hugs.</p>
 </div>
 
+<div class="hint">↑ ↑ ↓ ↓ ← → ← → B A</div>
+
 <script>
 const yes = document.getElementById('yes');
 const no = document.getElementById('no');
@@ -194,26 +228,13 @@ const loading = document.getElementById('loading');
 const receipt = document.getElementById('receipt');
 
 let scale = 1.0;
-let swapped = false;
+let loveyMode = false;
 
 /* ===== Yes / No Logic ===== */
-function positionButtons() {
+no.onclick = () => {
+  scale += 0.2;
+  yes.style.setProperty('--s', scale);
   yes.style.transform = `translateX(-50%) scale(${scale})`;
-  if (!swapped) {
-    no.style.left = '10%';
-  } else {
-    no.style.left = '70%';
-  }
-}
-
-no.onclick = (e) => { 
-  scale += 0.2; 
-  positionButtons(); 
-};
-
-no.onmouseover = () => { 
-  swapped = !swapped; 
-  positionButtons(); 
 };
 
 yes.onclick = () => {
@@ -223,7 +244,6 @@ yes.onclick = () => {
 };
 
 /* ===== CAPTCHA Logic ===== */
-// Check your folder names! Are they "true-love" or "True-Love"?
 const trueLoveImages = [
   'true-love/true-love1.jpg', 'true-love/true-love2.jpg', 
   'true-love/true-love3.jpg', 'true-love/true-love4.jpg'
@@ -236,18 +256,14 @@ const decoyImages = [
 function generateCaptcha() {
   const grid = document.getElementById('captchaGrid');
   grid.innerHTML = '';
-
   let deck = [
     ...trueLoveImages.map(src => ({ src, isTrue: true })),
     ...decoyImages.map(src => ({ src, isTrue: false }))
   ];
-
   deck.sort(() => Math.random() - 0.5);
-
   deck.forEach((img) => {
     const cell = document.createElement('div');
     cell.className = 'cell';
-    // Use background-image for the picture
     cell.style.backgroundImage = `url('${img.src}')`;
     cell.dataset.isTrue = img.isTrue;
     cell.onclick = () => cell.classList.toggle('selected');
@@ -259,14 +275,11 @@ function verifyCaptcha() {
   const cells = document.querySelectorAll('.cell');
   let isCorrect = true;
   let selectedCount = 0;
-
   cells.forEach(cell => {
     const isSelected = cell.classList.contains('selected');
     const isActuallyTrue = cell.dataset.isTrue === 'true';
     if (isSelected) selectedCount++;
-    if ((isActuallyTrue && !isSelected) || (!isActuallyTrue && isSelected)) {
-      isCorrect = false;
-    }
+    if ((isActuallyTrue && !isSelected) || (!isActuallyTrue && isSelected)) isCorrect = false;
   });
 
   if (isCorrect && selectedCount > 0) {
@@ -293,10 +306,43 @@ function startLoading() {
   }, 300);
 }
 
+/* ===== Konami Logic & Transformation ===== */
+const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+let konamiIndex = 0;
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === konamiCode[konamiIndex]) {
+    konamiIndex++;
+    if (konamiIndex === konamiCode.length) {
+      activateLoveyMode();
+      konamiIndex = 0;
+    }
+  } else {
+    konamiIndex = 0;
+  }
+});
+
+function activateLoveyMode() {
+  loveyMode = true;
+  document.body.classList.add('lovey-mode');
+  
+  // Start Heart Rain
+  setInterval(() => {
+    const heart = document.createElement('div');
+    heart.className = 'floating-heart';
+    heart.innerHTML = ['💖', '💝', '💘', '✨'][Math.floor(Math.random() * 4)];
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 5000);
+  }, 300);
+}
+
+/* ===== Cursor & Sparkles ===== */
 document.onmousemove = e => {
   const s = document.createElement('div');
   s.className = 'sparkle';
-  s.textContent = '✨';
+  s.textContent = loveyMode ? '💖' : '✨';
   s.style.left = e.pageX + 'px';
   s.style.top = e.pageY + 'px';
   document.body.appendChild(s);
