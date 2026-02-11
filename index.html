@@ -26,11 +26,12 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   max-width: 440px;
   position: relative;
+  z-index: 10;
 }
 
 .buttons {
   position: relative;
-  height: 100px;
+  height: 120px; /* Slightly taller to accommodate growing button */
   margin-top: 1rem;
 }
 
@@ -39,27 +40,34 @@ button {
   border-radius: 999px;
   border: none;
   font-size: 1rem;
-  position: absolute;
-  transition: all 0.25s ease;
+  transition: left 0.3s ease, transform 0.2s ease; /* Smooth movement and scaling */
   cursor: pointer;
+  position: absolute;
 }
 
 #yes {
   background: #ff6fae;
   color: white;
+  font-weight: bold;
+  z-index: 20;
+}
+
+/* Exited Shiver Animation */
+#yes:hover {
+  animation: shiver 0.15s infinite;
+}
+
+@keyframes shiver {
+  0% { transform: translateX(-50%) translate(0, 0); }
+  25% { transform: translateX(-50%) translate(2px, -2px); }
+  50% { transform: translateX(-50%) translate(-2px, 2px); }
+  75% { transform: translateX(-50%) translate(2px, 2px); }
+  100% { transform: translateX(-50%) translate(-2px, -2px); }
 }
 
 #no {
   background: #eee;
   color: #666;
-}
-
-#yes:hover {
-  animation: shake 0.3s infinite;
-}
-
-@keyframes shake {
-  50% { transform: translateY(-2px); }
 }
 
 /* ====== Terms ====== */
@@ -77,9 +85,10 @@ button {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.6);
   align-items: center;
   justify-content: center;
+  z-index: 100;
 }
 
 .modal-content {
@@ -88,33 +97,55 @@ button {
   border-radius: 16px;
   max-width: 420px;
   text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 /* ====== CAPTCHA ====== */
-.captcha { display:none; }
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 90px);
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
   gap: 8px;
   justify-content: center;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
 }
 
 .cell {
-  height: 90px;
-  border-radius: 10px;
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
   background-size: cover;
   background-position: center;
   cursor: pointer;
-  outline: 3px solid transparent;
+  border: 4px solid transparent;
+  transition: border 0.2s;
 }
 
 .cell.selected {
-  outline: 3px solid #ff6fae;
+  border: 4px solid #ff6fae;
+  position: relative;
 }
 
-/* ====== Loading ====== */
+.cell.selected::after {
+  content: '✔️';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ff6fae;
+  color: white;
+  font-size: 12px;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.verify-btn {
+  background: #ff6fae;
+  color: white;
+  width: 100%;
+  font-weight: bold;
+}
+
+/* ====== Loading & Receipt ====== */
 .loading, .receipt { display:none; }
 
 .bar {
@@ -130,44 +161,25 @@ button {
   background: linear-gradient(90deg, #ff6fae, #ff9ad5);
 }
 
-/* ====== Konami Hint ====== */
-.hint {
-  position: fixed;
-  bottom: 12px;
-  font-size: 0.85rem;
-  color: #ff9acb;
-  letter-spacing: 2px;
-  opacity: 0.85;
-}
-
-/* ====== Lovey Mode ====== */
-.lovey {
-  background: linear-gradient(135deg, #ff9ad5, #ffd1ec, #ffe8f5);
-  animation: shimmer 8s infinite linear;
-}
-
-@keyframes shimmer {
-  from { filter: hue-rotate(0deg); }
-  to { filter: hue-rotate(360deg); }
-}
-
+/* ====== Effects ====== */
 .heart {
   position: fixed;
   font-size: 20px;
   animation: floatUp 4s linear forwards;
   pointer-events: none;
+  z-index: 0;
 }
 
 @keyframes floatUp {
-  from { transform: translateY(0); opacity: 1; }
-  to { transform: translateY(-120px); opacity: 0; }
+  from { transform: translateY(0) rotate(0deg); opacity: 1; }
+  to { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
 }
 
-/* ====== Sparkles ====== */
 .sparkle {
   position: fixed;
   pointer-events: none;
   animation: pop 0.8s forwards;
+  z-index: 1000;
 }
 
 @keyframes pop {
@@ -187,23 +199,20 @@ button {
   <span class="terms-link" id="openTerms">Terms & Conditions</span>
 </div>
 
-<!-- CAPTCHA -->
-<div class="modal captcha" id="captcha">
+<div class="modal" id="captchaModal">
   <div class="modal-content">
     <h3>Security Check</h3>
-    <p>Select all images containing <strong>true love</strong></p>
+    <p>Pick true love 😌</p>
     <div class="grid" id="captchaGrid"></div>
-    <button onclick="verifyCaptcha()">Verify</button>
+    <button class="verify-btn" onclick="verifyCaptcha()">Verify Identity</button>
   </div>
 </div>
 
-<!-- Loading -->
 <div class="card loading" id="loading">
   <h2>Verifying Babe Status…</h2>
   <div class="bar"><div class="bar-fill" id="barFill"></div></div>
 </div>
 
-<!-- Receipt -->
 <div class="card receipt" id="receipt">
   <h2>Transaction Successful ✅</h2>
   <p><strong>Your “Babe” status has been successfully verified.</strong></p>
@@ -211,157 +220,142 @@ button {
   <p>Patch scheduled tonight. Please prepare hugs.</p>
 </div>
 
-<!-- Terms Modal -->
 <div class="modal" id="termsModal">
   <div class="modal-content">
     <p><strong>Terms and Conditions</strong></p>
-    <p>
-      By completing the above verification process, the user agrees to a minimum
-      of one (1!!) uninterrupted hour of undivided attention upon the administrator’s return.
-    </p>
-    <p>
-      The DBC assumes no responsibility for any emotional distress caused by the
-      intentionally unclickable “No” button.
-    </p>
-    <button onclick="closeTerms()">Understood 💗</button>
+    <p>By completing the above verification process, the user agrees to a minimum of one (1!!) uninterrupted hour of undivided attention upon the administrator’s return.</p>
+    <p>The DBC assumes no responsibility for any emotional distress caused by the intentionally unclickable “No” button.</p>
+    <button onclick="closeTerms()" style="background:#ff6fae; color:white;">Understood 💗</button>
   </div>
 </div>
 
-<div class="hint">↑ ↑ ↓ ↓ ← → ← → B A</div>
-
 <script>
-/* ===== Yes / No Logic ===== */
 const yes = document.getElementById('yes');
 const no = document.getElementById('no');
-let scale = 1;
+const mainCard = document.getElementById('mainCard');
+const captchaModal = document.getElementById('captchaModal');
+const loading = document.getElementById('loading');
+const receipt = document.getElementById('receipt');
+
+let scale = 1.0;
 let swapped = false;
 
+/* ===== Yes / No Logic ===== */
 function positionButtons() {
+  // We keep the Yes button at center (50%) but let it grow
+  // The No button swaps between 15% and 80% to run away
   if (!swapped) {
     yes.style.left = '50%';
     yes.style.transform = `translateX(-50%) scale(${scale})`;
-    no.style.left = '20%';
+    no.style.left = '15%';
+    no.style.transform = `translateX(0)`;
   } else {
-    no.style.left = '50%';
-    no.style.transform = 'translateX(-50%)';
-    yes.style.left = '20%';
+    no.style.left = '80%';
+    no.style.transform = 'translateX(-100%)';
+    yes.style.left = '50%';
+    yes.style.transform = `translateX(-50%) scale(${scale})`;
   }
 }
-
 positionButtons();
 
-no.onclick = () => {
-  scale += 0.2;
-  positionButtons();
+// Clicking No makes Yes grow by 20% (0.2)
+no.onclick = (e) => { 
+  e.preventDefault();
+  scale += 0.2; 
+  positionButtons(); 
 };
 
-no.onmouseover = () => {
-  swapped = !swapped;
-  positionButtons();
+// Hovering No makes it swap positions
+no.onmouseover = () => { 
+  swapped = !swapped; 
+  positionButtons(); 
 };
 
 yes.onclick = () => {
   mainCard.style.display = 'none';
-  captcha.style.display = 'flex';
+  captchaModal.style.display = 'flex';
   generateCaptcha();
 };
 
-/* ===== CAPTCHA ===== */
+/* ===== CAPTCHA Logic ===== */
 const trueLoveImages = [
-  'true-love/love1.jpg',
-  'true-love/love2.jpg',
-  'true-love/love3.jpg'
+  'true-love/love1.jpg', 'true-love/love2.jpg', 
+  'true-love/love3.jpg', 'true-love/love4.jpg'
 ];
-
 const decoyImages = [
-  'decoy/decoy1.jpg',
-  'decoy/decoy2.jpg',
-  'decoy/decoy3.jpg'
+  'decoy/decoy1.jpg', 'decoy/decoy2.jpg', 
+  'decoy/decoy3.jpg', 'decoy/decoy4.jpg', 'decoy/decoy5.jpg'
 ];
-
-let correctSet = new Set();
 
 function generateCaptcha() {
   const grid = document.getElementById('captchaGrid');
   grid.innerHTML = '';
-  correctSet.clear();
 
-  let images = [];
-  for (let i = 0; i < 3; i++) {
-    images.push({src: trueLoveImages[Math.floor(Math.random()*trueLoveImages.length)], true:true});
-    images.push({src: decoyImages[Math.floor(Math.random()*decoyImages.length)], true:false});
-  }
+  let deck = [
+    ...trueLoveImages.map(src => ({ src, isTrue: true })),
+    ...decoyImages.map(src => ({ src, isTrue: false }))
+  ];
 
-  images = images.sort(() => Math.random() - 0.5).slice(0,9);
+  deck.sort(() => Math.random() - 0.5);
 
-  images.forEach((img, idx) => {
+  deck.forEach((img) => {
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.style.backgroundImage = `url(${img.src})`;
-    if (img.true) correctSet.add(idx);
+    cell.dataset.isTrue = img.isTrue;
     cell.onclick = () => cell.classList.toggle('selected');
     grid.appendChild(cell);
   });
 }
 
 function verifyCaptcha() {
-  captcha.style.display = 'none';
-  loading.style.display = 'block';
+  const cells = document.querySelectorAll('.cell');
+  let isCorrect = true;
 
+  cells.forEach(cell => {
+    const isSelected = cell.classList.contains('selected');
+    const isActuallyTrue = cell.dataset.isTrue === 'true';
+    if ((isActuallyTrue && !isSelected) || (!isActuallyTrue && isSelected)) {
+      isCorrect = false;
+    }
+  });
+
+  if (isCorrect) {
+    captchaModal.style.display = 'none';
+    startLoading();
+  } else {
+    alert("Incorrect! True love only, please. 😤");
+    generateCaptcha();
+  }
+}
+
+function startLoading() {
+  loading.style.display = 'block';
   let p = 0;
   let bar = document.getElementById('barFill');
   let i = setInterval(() => {
-    p += Math.random() * 30;
-    bar.style.width = Math.min(p,100)+'%';
+    p += Math.random() * 15;
+    bar.style.width = Math.min(p, 100) + '%';
     if (p >= 100) {
       clearInterval(i);
       loading.style.display = 'none';
       receipt.style.display = 'block';
     }
-  }, 400);
+  }, 300);
 }
 
-/* ===== Terms ===== */
-openTerms.onclick = () => termsModal.style.display = 'flex';
-function closeTerms(){ termsModal.style.display='none'; }
+/* ===== Terms & Misc ===== */
+document.getElementById('openTerms').onclick = () => document.getElementById('termsModal').style.display = 'flex';
+function closeTerms() { document.getElementById('termsModal').style.display = 'none'; }
 
-/* ===== Konami Lovey Mode ===== */
-const code = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
-let idx = 0;
-let lovey = false;
-
-window.onkeydown = e => {
-  if (e.key === code[idx]) {
-    idx++;
-    if (idx === code.length) {
-      lovey = !lovey;
-      document.body.classList.toggle('lovey');
-      idx = 0;
-    }
-  } else idx = 0;
-};
-
-/* Floating hearts */
-setInterval(() => {
-  if (!lovey) return;
-  const h = document.createElement('div');
-  h.className = 'heart';
-  h.textContent = '💖';
-  h.style.left = Math.random() * window.innerWidth + 'px';
-  h.style.top = window.innerHeight + 'px';
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),4000);
-}, 600);
-
-/* Sparkly cursor */
 document.onmousemove = e => {
   const s = document.createElement('div');
   s.className = 'sparkle';
-  s.textContent = lovey ? '💖✨' : '✨';
-  s.style.left = e.pageX+'px';
-  s.style.top = e.pageY+'px';
+  s.textContent = '✨';
+  s.style.left = e.pageX + 'px';
+  s.style.top = e.pageY + 'px';
   document.body.appendChild(s);
-  setTimeout(()=>s.remove(),800);
+  setTimeout(() => s.remove(), 800);
 };
 </script>
 </body>
