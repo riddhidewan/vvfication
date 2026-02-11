@@ -103,7 +103,17 @@ button {
   left: 10%;
 }
 
-/* ====== CAPTCHA ====== */
+/* ====== Terms Link Styling ====== */
+.terms-link {
+  font-size: 0.75rem;
+  margin-top: 1.5rem;
+  display: block;
+  color: #bbb;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ====== Modals ====== */
 .modal {
   display: none;
   position: fixed;
@@ -192,7 +202,7 @@ button {
   to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
 }
 
-/* ====== Enhanced Konami Hint (NEW SECTION) ====== */
+/* ====== Enhanced Konami Hint ====== */
 .hint {
   position: fixed;
   bottom: 20px;
@@ -236,6 +246,19 @@ button {
     <button id="yes" class="shiver-active" style="--s: 1.0">Yes 💖</button>
     <button id="no">No</button>
   </div>
+  <span class="terms-link" onclick="openTerms()">Terms & Conditions</span>
+</div>
+
+<div class="modal" id="termsModal">
+  <div class="modal-content">
+    <h3 style="color:#ff6fae;">Terms & Conditions</h3>
+    <p style="font-size: 0.9rem; color: #666; text-align: left;">
+      1. Completion of this form constitutes a legally binding agreement for one (1) evening of mandatory romance.<br><br>
+      2. The "No" button is for aesthetic purposes only. Attempting to click it is a violation of DBC protocol.<br><br>
+      3. Account holder agrees to unlimited forehead kisses.
+    </p>
+    <button onclick="closeTerms()" style="background:#ff6fae; color:white; width:100%;">I AGREE 💗</button>
+  </div>
 </div>
 
 <div class="modal" id="captchaModal">
@@ -272,9 +295,14 @@ const mainCard = document.getElementById('mainCard');
 const captchaModal = document.getElementById('captchaModal');
 const loading = document.getElementById('loading');
 const receipt = document.getElementById('receipt');
+const termsModal = document.getElementById('termsModal');
 
 let scale = 1.0;
 let loveyMode = false;
+
+/* Terms Functions */
+function openTerms() { termsModal.style.display = 'flex'; }
+function closeTerms() { termsModal.style.display = 'none'; }
 
 no.onclick = () => {
   scale += 0.2;
